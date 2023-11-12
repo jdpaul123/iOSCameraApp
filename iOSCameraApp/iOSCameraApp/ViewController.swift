@@ -31,7 +31,7 @@ class ViewController: UIViewController {
         case notAuthorized
         case configurationFailed
     }
-    private var setUpResult: SessionSetupResult = .notAuthorized
+    private var setUpResult: SessionSetupResult = .notAuthorized // TODO: AVCam initializes this to .success
     private let session = AVCaptureSession() // This session accepts input data from capture devices and sends the data revieved to the correct outputs
     private let sessionQueue = DispatchQueue(label: "session queue")
     /*
@@ -47,10 +47,17 @@ class ViewController: UIViewController {
      the session queue so as to not block the main threads priority of keeping a smooth UI/UX running.
      */
 
+    // @objc exposes this property to be able to be used in objective-c. For cross-language interopability
+    // dynamic enables dynamic dispatch for the property. In swift most everything uses static dispatch by default.
+    // In dynamic dispatch the exact property to be used is determined at runtime
+    // TODO: I think that @objc dynamic is necessary for key-value observice (KVO)
+    @objc dynamic var videoDeviceInput : AVCaptureDeviceInput!
+
     // Create the PreviewView which is a view that displays the AVCaptureVideoPreviewLayer as it's backing layer.
     @IBOutlet private weak var previewView: PreviewView!
     @IBOutlet private weak var cameraCaptureButton: UIButton!
 
+    // MARK: View Controller Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -99,6 +106,7 @@ class ViewController: UIViewController {
         }
     }
 
+    // MARK: Session Management
     // Only call this on the session queue
     func configureSession() {
         // The app will do nothing if it does not have the right permissions. The user has to go to settings to give the acces now
@@ -107,6 +115,100 @@ class ViewController: UIViewController {
         if setUpResult != .success {
             return
         }
+
+        // Makes atomic updates to the session to avoid any changes of the session happening in the wrong order and causing unexpected results
+        // end block with session.commitConfiguration()
+        session.beginConfiguration()
+
+        // Do not create an AVCaptureMovieFileOutput when setting up the session
+        // because Live Photo is not supported when AVCaptureMovieFileOutput is
+        // added to the session.
+
+        // Set the quality level or bit rate for the captured media
+        session.sessionPreset = .photo
+
+        /*
+         Steps to configure the session to be ready to take photos
+         Add video input
+         Add audio input
+         Add photo output
+         */
+
+        // Add video input
+        do {
+            // Handle the situation when the system-preferred camera is nil.
+            var defaultVideoDevice: AVCaptureDevice? = AVCaptureDevice.systemPreferredCamera // Apple determines this camera bases on many factors. It can change at any time
+
+            let userDefaults = UserDefaults.standard
+            // If there is no saved initial camera and Apple determines there is no preferred camera then create a discovery session to determine it in-app
+            if !userDefaults.bool(forKey: "setInitialUserPreferredCamera") || defaultVideoDevice == nil {
+                // We would prefer to star the app on the back camera
+                // This constant will contain the best possible camera available based on the order of deviceTypes
+                let backVideoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera],
+                                                                                       mediaType: .video, position: .back)
+
+                // Lets save this as the default camera for next time the app is opened
+                defaultVideoDevice = backVideoDeviceDiscoverySession.devices.first
+
+                AVCaptureDevice.userPreferredCamera = defaultVideoDevice
+
+                userDefaults.set(true, forKey: "setInitialUserPreferredCamera")
+            }
+
+            // Default video device could still be nil if we have not found a camera that is available
+            guard let videoDevice = defaultVideoDevice else {
+                print("Default video device unavailable.")
+                setUpResult = .configurationFailed
+                session.commitConfiguration()
+                return
+            }
+
+            // Create our input device that will be connected to the session
+            let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
+
+            // TODO: Come back to KVO for the app
+//            AVCaptureDevice.self.addObserver(self, forKeyPath: "systemPreferredCamera", options: [.new], context: &systemPreferredCameraContext)
+
+            // Finally, set the sessions input video device
+            if session.canAddInput(videoDeviceInput) {
+                session.addInput(videoDeviceInput)
+                self.videoDeviceInput = videoDeviceInput
+
+                /* TODO: Create createDeviceRotationCoordinator() to deal with device rotations
+                DispatchQueue.main.async {
+
+                }
+                 */
+            } else {
+                print("Couldn't add video device input to the session.")
+                setUpResult = .configurationFailed
+                session.commitConfiguration()
+                return
+            }
+        } catch {
+            print("Couln't create video device input: \(error)")
+            setUpResult = .configurationFailed
+            session.commitConfiguration()
+            return
+        }
+
+        // Add an audio input device.
+        do {
+            let audioDevice = AVCaptureDevice.default(for: .audio)
+            // Force unwrap: Assume that we got an audio device whether it is nil or not
+            let audioDeviceInput = try AVCaptureDeviceInput(device: audioDevice!)
+
+            // Add the audio device to the session
+            if session.canAddInput(audioDeviceInput) {
+                session.addInput(audioDeviceInput)
+            } else {
+                print("Could not add audio device input to the session")
+            }
+        } catch {
+            print("Could not create audio device input: \(error)")
+        }
+
+        session.commitConfiguration()
     }
 }
 
