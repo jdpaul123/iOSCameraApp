@@ -12,7 +12,7 @@ import AVFoundation
 // To show the user what the camera sees we use an AVCaptureVideoPreviewLayer. It, however, is not a view; it is a CALayer which you can put on a view as it's
 // sublayer. This class also facilitates session management
 
-// Why is AVCaptureVideoPreviewLayer a CLLayer rather than UIView?
+// Why is AVCaptureVideoPreviewLayer a CLAayer rather than UIView?
 // This is probably so that we can build custom views on top of the layer, CALayer is more efficient with animation so sepertaing the concern of rendering
 // video frames from the view itself could have efficiency benefits.
 class PreviewView: UIView {

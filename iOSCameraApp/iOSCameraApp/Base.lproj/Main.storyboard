@@ -48,6 +48,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="cameraCaptureButton" destination="HeJ-YR-GDq" id="WMl-Os-jxb"/>
                         <outlet property="previewView" destination="YeM-Bi-Dpk" id="By7-Qu-a6w"/>
                     </connections>
                 </viewController>
