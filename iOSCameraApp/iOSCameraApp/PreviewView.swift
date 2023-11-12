@@ -41,5 +41,4 @@ class PreviewView: UIView {
             videoPreviewLayer.session = newValue
         }
     }
-
 }

@@ -16,6 +16,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YeM-Bi-Dpk" userLabel="Preview" customClass="PreviewView" customModule="iOSCameraApp" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HeJ-YR-GDq">
                                 <rect key="frame" x="166.66666666666666" y="748" width="60" height="60"/>
                                 <constraints>
@@ -34,15 +38,22 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="HeJ-YR-GDq" secondAttribute="bottom" constant="10" id="2O1-Mv-aPn"/>
+                            <constraint firstItem="YeM-Bi-Dpk" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="3cr-wn-xPP"/>
+                            <constraint firstItem="YeM-Bi-Dpk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="5Zu-bT-nQj"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="MQl-dc-Xh0"/>
+                            <constraint firstItem="YeM-Bi-Dpk" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ZgU-2s-unV"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="HeJ-YR-GDq" secondAttribute="trailing" constant="10" id="fSW-KN-vDH"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="oGD-fn-Tec"/>
+                            <constraint firstItem="YeM-Bi-Dpk" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="u5J-G0-ZfI"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="previewView" destination="YeM-Bi-Dpk" id="By7-Qu-a6w"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="131" y="-27"/>
+            <point key="canvasLocation" x="130.53435114503816" y="-27.464788732394368"/>
         </scene>
     </scenes>
     <resources>
