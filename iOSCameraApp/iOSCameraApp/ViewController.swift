@@ -23,7 +23,6 @@ import CoreLocation
 // TODO: Add NSPhotoLibraryUsageDescription key in Info.plist to save photos and videos
 class ViewController: UIViewController {
 
-    // MARK: Properties
     // MARK: Session Management Properties
     let locationManager = CLLocationManager()
 
@@ -32,8 +31,9 @@ class ViewController: UIViewController {
         case notAuthorized
         case configurationFailed
     }
-    private var setUpResult: SessionSetupResult = .notAuthorized // TODO: AVCam initializes this to .success
+    private var setUpResult: SessionSetupResult = .success // We assume success unless there is some kind of failure or permission denial that occurs in ViewDidLoad or ViewWillAppear
     private let session = AVCaptureSession() // This session accepts input data from capture devices and sends the data revieved to the correct outputs
+    private var isSessionRunning = false
     private let sessionQueue = DispatchQueue(label: "session queue")
     /*
      Steps to use session:
@@ -118,6 +118,55 @@ class ViewController: UIViewController {
         // and takes a moment to run
         sessionQueue.async {
             self.configureSession()
+        }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        sessionQueue.async {
+            switch self.setUpResult {
+            case .success:
+                // Only setup observers and start the session if setup succeeded.
+//                TODO: self.addObservers()
+                // After this code gets run the user will see the AVCaptureVideoPreview layer with a live preivew from the selected camera
+                self.session.startRunning()
+                self.isSessionRunning = self.session.isRunning
+            case .notAuthorized:
+                // If the user is not authorized tell them to go settings and allow video
+                DispatchQueue.main.async {
+                    let changePrivacySetting = "AVCam doesn't have permission to use the camera, please change privacy settings"
+                    let message = NSLocalizedString(changePrivacySetting, comment: "Alert message when the user has denied access to the camera")
+                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
+
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"),
+                                                            style: .cancel,
+                                                            handler: nil))
+
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: "Alert button to open Settings"),
+                                                            style: .`default`,
+                                                            handler: { _ in
+                                                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
+                                                                                          options: [:],
+                                                                                          completionHandler: nil)
+                    }))
+
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            case .configurationFailed:
+                // If the config fialed then say it failed and dont do anything about it
+                DispatchQueue.main.async {
+                    let alertMsg = "Alert message when something goes wrong during capture session configuration"
+                    let message = NSLocalizedString("Unable to capture media", comment: alertMsg)
+                    let alertController = UIAlertController(title: "AVCam", message: message, preferredStyle: .alert)
+
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"),
+                                                            style: .cancel,
+                                                            handler: nil))
+
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }
         }
     }
 
@@ -261,6 +310,7 @@ class ViewController: UIViewController {
         }
     }
 
+    // MARK: Capturing Photos
     private func setUpPhotoSettings() -> AVCapturePhotoSettings {
         var photoSettings = AVCapturePhotoSettings()
 
@@ -281,7 +331,7 @@ class ViewController: UIViewController {
 
         // TODO: What does this if statement do?
         if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
-            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes]
+            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes.first!]
         }
         photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
 
