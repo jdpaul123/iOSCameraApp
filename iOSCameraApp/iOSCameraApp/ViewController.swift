@@ -62,7 +62,7 @@ class ViewController: UIViewController {
 
     private let photoOutput = AVCapturePhotoOutput()
 
-    // FIXME: I think we could have made this optional rather than force unwrapping it on first access
+    // FIXME: Why did we not make this optional or have a default value rather than force unwrapping it on first access?
     private var photoSettings: AVCapturePhotoSettings!
 
     private enum LivePhotoMode {
