@@ -24,6 +24,7 @@ import CoreLocation
 class ViewController: UIViewController {
 
     // MARK: Properties
+    // MARK: Session Management Properties
     let locationManager = CLLocationManager()
 
     private enum SessionSetupResult {
@@ -55,7 +56,21 @@ class ViewController: UIViewController {
 
     // Create the PreviewView which is a view that displays the AVCaptureVideoPreviewLayer as it's backing layer.
     @IBOutlet private weak var previewView: PreviewView!
+
+    // MARK: Capturing Photos Properties
     @IBOutlet private weak var cameraCaptureButton: UIButton!
+
+    private let photoOutput = AVCapturePhotoOutput()
+
+    // FIXME: I think we could have made this optional rather than force unwrapping it on first access
+    private var photoSettings: AVCapturePhotoSettings!
+
+    private enum LivePhotoMode {
+        case on, off
+    }
+    private var livePhotoMode: LivePhotoMode = .off
+
+    private var photoQualityPrioritizationMode: AVCapturePhotoOutput.QualityPrioritization = .balanced
 
     // MARK: View Controller Life Cycle
     override func viewDidLoad() {
@@ -208,7 +223,69 @@ class ViewController: UIViewController {
             print("Could not create audio device input: \(error)")
         }
 
+        // Add the photo output
+        if session.canAddOutput(photoOutput) {
+            session.addOutput(photoOutput)
+
+            // Set live photo mode on if possible
+            photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported
+            // Indicates that the output that the reciever must be able to handle up to .quality level quality
+            photoOutput.maxPhotoQualityPrioritization = .quality
+            // TODO: Not sure why we save this property? I am guessing it has to do with switching between photos and videos
+            livePhotoMode = photoOutput.isLivePhotoCaptureEnabled ? .on : .off
+            // Set our default preference for photo quality.
+            photoQualityPrioritizationMode = .balanced
+
+            // Now configure the output. In configurePhotoOutput() it also calls setUpPhotoSettings()
+            self.configurePhotoOutput()
+        }
+
         session.commitConfiguration()
+    }
+
+    private func configurePhotoOutput() {
+        let supportedMaxPhotoDimensions = self.videoDeviceInput.device.activeFormat.supportedMaxPhotoDimensions
+        // TODO: Why do we get the .last item? My guess is that .supportedMaxPhotoDimensions always holds an array of 1 CMVideoDimensions or it's empty otherwise
+        let largestDimension = supportedMaxPhotoDimensions.last
+        self.photoOutput.maxPhotoDimensions = largestDimension!
+        // Set these different options for the photo output if they are supported
+        self.photoOutput.isLivePhotoCaptureEnabled = self.photoOutput.isLivePhotoCaptureSupported
+        self.photoOutput.maxPhotoQualityPrioritization = .quality
+        self.photoOutput.isResponsiveCaptureEnabled = self.photoOutput.isResponsiveCaptureSupported
+        self.photoOutput.isFastCapturePrioritizationEnabled = self.photoOutput.isFastCapturePrioritizationSupported // TODO: Is this a new feature from iOS 17
+        self.photoOutput.isAutoDeferredPhotoDeliveryEnabled = self.photoOutput.isAutoDeferredPhotoDeliverySupported // TODO: Is this a new feature from iOS 17
+
+        let photoSettings = self.setUpPhotoSettings()
+        DispatchQueue.main.async {
+            self.photoSettings = photoSettings
+        }
+    }
+
+    private func setUpPhotoSettings() -> AVCapturePhotoSettings {
+        var photoSettings = AVCapturePhotoSettings()
+
+        // Capture HEIF photos when supported
+        if self.photoOutput.availablePhotoCodecTypes.contains(AVVideoCodecType.hevc) {
+            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        } else {
+            // FIXME: This seems to be redundant
+            photoSettings = AVCapturePhotoSettings()
+        }
+
+        // Set the flash to auto mode
+        if self.videoDeviceInput.device.isFlashAvailable {
+            photoSettings.flashMode = .auto
+        }
+
+        photoSettings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
+
+        // TODO: What does this if statement do?
+        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
+            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes]
+        }
+        photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
+
+        return photoSettings
     }
 }
 
