@@ -20,6 +20,7 @@ import CoreLocation
     - Setup should not block the main thread so do all of the work on a dedicated serial dispatch queue
  */
 
+// TODO: Make the capturePhotoButton and all UI move correctly when the orientation of the device changes
 // TODO: Add NSPhotoLibraryUsageDescription key in Info.plist to save photos and videos
 class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinatorDelegate {
 
@@ -77,13 +78,17 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
 
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
 
+    // TODO: Uncomment this when I impliment video
+//    private let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInTrueDepthCamera],
+//                                                                               mediaType: .video, position: .unspecified)
+
     // MARK: View Controller Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // TODO: This button never gets enabled, so it must get enabled at some point
         // Disable buttons until everything is setup
-        cameraCaptureButton.isEnabled = true
+        cameraCaptureButton.isEnabled = false
 
         // Connect the instance of AVCaptureSession called self.session to the previewView's session property. The setter in Preview View then sets this\
         // instance of AVCaptureSession to the session for the AVCaptureVideoPreviewLayer instance called videoPreviewLayer. videoPreviewLayer's setter
@@ -134,7 +139,7 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
             switch self.setUpResult {
             case .success:
                 // Only setup observers and start the session if setup succeeded.
-//                TODO: self.addObservers()
+                self.addObservers()
                 // After this code gets run the user will see the AVCaptureVideoPreview layer with a live preivew from the selected camera
                 self.session.startRunning()
                 self.isSessionRunning = self.session.isRunning
@@ -479,4 +484,38 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
             self.previewView.videoPreviewLayer.connection?.videoRotationAngle = videoRotationAngleForHorizonLevelPreview
         })
     }
+
+    // MARK: KVO and Notifications
+
+    private var keyValueObservations = [NSKeyValueObservation]()
+    /// - Tag: ObserveInterruption
+    private func addObservers() {
+        let keyValueObservation = session.observe(\.isRunning, options: .new) { _, change in
+            guard let isSessionRunning = change.newValue else { return }
+//          TODO: NEED THIS FOR ENABLING A DIFFERENT BUTTON  let isLivePhotoCaptureEnabled = self.photoOutput.isLivePhotoCaptureEnabled
+
+            DispatchQueue.main.async {
+                self.cameraCaptureButton.isEnabled = isSessionRunning
+            }
+        }
+        keyValueObservations.append(keyValueObservation)
+
+        // TODO: Observe app interuptions and deal with them
+    }
 }
+
+
+// MARK: AVCaptureDevice.DiscoverySession
+// TODO: Figure out what this is for. IK it has to do with video
+//extension AVCaptureDevice.DiscoverySession {
+//    var uniqueDevicePositionsCount: Int {
+//
+//        var uniqueDevicePositions = [AVCaptureDevice.Position]()
+//
+//        for device in devices where !uniqueDevicePositions.contains(device.position) {
+//            uniqueDevicePositions.append(device.position)
+//        }
+//
+//        return uniqueDevicePositions.count
+//    }
+//}
