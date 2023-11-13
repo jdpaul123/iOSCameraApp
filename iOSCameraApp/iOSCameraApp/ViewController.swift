@@ -174,8 +174,7 @@ class ViewController: UIViewController {
     // Only call this on the session queue
     func configureSession() {
         // The app will do nothing if it does not have the right permissions. The user has to go to settings to give the acces now
-        // TODO: Prompt the user to change settings if they have not authorized video.
-        // TODO: Also. notify them if audio permissions are not authorized so they know why their videos from the app have no audio
+        // TODO: notify them if audio permissions are not authorized so they know why their videos from the app have no audio
         if setUpResult != .success {
             return
         }
@@ -238,11 +237,12 @@ class ViewController: UIViewController {
                 session.addInput(videoDeviceInput)
                 self.videoDeviceInput = videoDeviceInput
 
-                /* TODO: Create createDeviceRotationCoordinator() to deal with device rotations
                 DispatchQueue.main.async {
-
+                    // You do not need to serialize AVCaptureVideoPreviewLayer's connection with other session manipulation
+                    // This is on the main thread because changing orientations affects the UI
+                    // This deals with rotation of the AVCaptureVideoPreviewLayer, but does NOT deal with moving the buttons on screen correctly
+                    self.createDeviceRotationCoordinator()
                 }
-                 */
             } else {
                 print("Couldn't add video device input to the session.")
                 setUpResult = .configurationFailed
@@ -337,5 +337,26 @@ class ViewController: UIViewController {
 
         return photoSettings
     }
-}
 
+    // MARK: Device Configuration
+
+    // RotationCoordinator monitors the orientation of the device relative to gravity
+    private var videoDeviceRotationCoordinator: AVCaptureDevice.RotationCoordinator!
+
+    // MARK: Readiness Coordinator
+
+    private var videoRotationAngleForHorizonLevelPreviewObservation: NSKeyValueObservation?
+
+    private func createDeviceRotationCoordinator() {
+        videoDeviceRotationCoordinator = AVCaptureDevice.RotationCoordinator(device: videoDeviceInput.device, previewLayer: previewView.videoPreviewLayer)
+        // The connection manages the flow of data between the capture device (camera) and the output (preview layer)
+        previewView.videoPreviewLayer.connection?.videoRotationAngle = videoDeviceRotationCoordinator.videoRotationAngleForHorizonLevelPreview
+
+        // Using KVO, observe any changes to roation and update the previewView's videoPreviewLayer's (type: AVCaptureVideoPreviewLayer) videoRoationAngle
+        videoRotationAngleForHorizonLevelPreviewObservation = videoDeviceRotationCoordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: .new, changeHandler: { _, change in
+            guard let videoRotationAngleForHorizonLevelPreview = change.newValue else { return }
+
+            self.previewView.videoPreviewLayer.connection?.videoRotationAngle = videoRotationAngleForHorizonLevelPreview
+        })
+    }
+}
