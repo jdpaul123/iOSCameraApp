@@ -325,9 +325,9 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         // Set these different options for the photo output if they are supported
         self.photoOutput.isLivePhotoCaptureEnabled = self.photoOutput.isLivePhotoCaptureSupported
         self.photoOutput.maxPhotoQualityPrioritization = .quality
-        self.photoOutput.isResponsiveCaptureEnabled = self.photoOutput.isResponsiveCaptureSupported
-        self.photoOutput.isFastCapturePrioritizationEnabled = self.photoOutput.isFastCapturePrioritizationSupported // TODO: Is this a new feature from iOS 17
-        self.photoOutput.isAutoDeferredPhotoDeliveryEnabled = self.photoOutput.isAutoDeferredPhotoDeliverySupported // TODO: Is this a new feature from iOS 17
+        self.photoOutput.isResponsiveCaptureEnabled = self.photoOutput.isResponsiveCaptureSupported // TODO: This is new for iOS 17
+        self.photoOutput.isFastCapturePrioritizationEnabled = self.photoOutput.isFastCapturePrioritizationSupported // TODO: This is new for iOS 17
+        self.photoOutput.isAutoDeferredPhotoDeliveryEnabled = self.photoOutput.isAutoDeferredPhotoDeliverySupported // TODO: This is new for iOS 17
 
         let photoSettings = self.setUpPhotoSettings()
         DispatchQueue.main.async {
