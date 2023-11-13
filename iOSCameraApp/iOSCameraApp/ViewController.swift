@@ -21,7 +21,7 @@ import CoreLocation
  */
 
 // TODO: Add NSPhotoLibraryUsageDescription key in Info.plist to save photos and videos
-class ViewController: UIViewController {
+class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinatorDelegate {
 
     // MARK: Session Management Properties
     let locationManager = CLLocationManager()
@@ -61,6 +61,8 @@ class ViewController: UIViewController {
     @IBOutlet private weak var cameraCaptureButton: UIButton!
 
     private let photoOutput = AVCapturePhotoOutput()
+
+    private var photoOutputReadinessCoordinator: AVCapturePhotoOutputReadinessCoordinator!
 
     // FIXME: Why did we not make this optional or have a default value rather than force unwrapping it on first access?
     private var photoSettings: AVCapturePhotoSettings!
@@ -172,7 +174,7 @@ class ViewController: UIViewController {
 
     // MARK: Session Management
     // Only call this on the session queue
-    func configureSession() {
+    private func configureSession() {
         // The app will do nothing if it does not have the right permissions. The user has to go to settings to give the acces now
         // TODO: notify them if audio permissions are not authorized so they know why their videos from the app have no audio
         if setUpResult != .success {
@@ -287,6 +289,20 @@ class ViewController: UIViewController {
 
             // Now configure the output. In configurePhotoOutput() it also calls setUpPhotoSettings()
             self.configurePhotoOutput()
+
+            // AVCapturePhotoOutputReadinessCoordinator is new in iOS 17. It monitors an AVCapturePhotoOutput object's readiness
+            // ViewController conforms to AVCapturePhotoOutputReadinessCoordinatorDelege so we can use the methods in that delegate
+            // to react to changes in the readiness value to know when to update the UI from a background queue like the session queue.
+            let readinessCoordinator = AVCapturePhotoOutputReadinessCoordinator(photoOutput: photoOutput)
+            DispatchQueue.main.async {
+                self.photoOutputReadinessCoordinator = readinessCoordinator
+                readinessCoordinator.delegate = self
+            }
+        } else {
+            print("Could not add photo output to the session")
+            setUpResult = .configurationFailed
+            session.commitConfiguration()
+            return
         }
 
         session.commitConfiguration()
@@ -344,6 +360,14 @@ class ViewController: UIViewController {
     private var videoDeviceRotationCoordinator: AVCaptureDevice.RotationCoordinator!
 
     // MARK: Readiness Coordinator
+
+    // This function is a delegate function from conforming to AVCapturePhotoOutputReadinessCoordinatorDelegate
+    func readinessCoordinator(_ coordinator: AVCapturePhotoOutputReadinessCoordinator, captureReadinessDidChange captureReadiness: AVCapturePhotoOutput.CaptureReadiness) {
+        // Enable user interaction fro the shutter button only when the output is ready to capture
+        self.cameraCaptureButton.isUserInteractionEnabled = (captureReadiness == .ready) ? true : false
+
+        // Note: You can customize the shutter button's appearance based on `captureReadiness`.
+    }
 
     private var videoRotationAngleForHorizonLevelPreviewObservation: NSKeyValueObservation?
 
