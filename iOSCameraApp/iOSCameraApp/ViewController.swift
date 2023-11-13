@@ -356,8 +356,7 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
 
     // MARK: Device Configuration
 
-    // RotationCoordinator monitors the orientation of the device relative to gravity
-    private var videoDeviceRotationCoordinator: AVCaptureDevice.RotationCoordinator!
+
 
     // MARK: Readiness Coordinator
 
@@ -369,8 +368,12 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         // Note: You can customize the shutter button's appearance based on `captureReadiness`.
     }
 
+    // MARK: Device Rotation
+    // RotationCoordinator monitors the orientation of the device relative to gravity
+    private var videoDeviceRotationCoordinator: AVCaptureDevice.RotationCoordinator!
     private var videoRotationAngleForHorizonLevelPreviewObservation: NSKeyValueObservation?
 
+    // Deals with rotating the AVCaptureVideoPreviewLayer when the devices orientation changes
     private func createDeviceRotationCoordinator() {
         videoDeviceRotationCoordinator = AVCaptureDevice.RotationCoordinator(device: videoDeviceInput.device, previewLayer: previewView.videoPreviewLayer)
         // The connection manages the flow of data between the capture device (camera) and the output (preview layer)
