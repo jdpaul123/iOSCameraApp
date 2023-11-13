@@ -304,7 +304,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iOSCameraApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Give access to your camera or the app will not work properly";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App uses your location to tag where pictures or videos are taken";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Give access to your microphones or any video will not have audio";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To save photos the app must have access to your Photo Library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -334,7 +336,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iOSCameraApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Give access to your camera or the app will not work properly";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "App uses your location to tag where pictures or videos are taken";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Give access to your microphones or any video will not have audio";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To save photos the app must have access to your Photo Library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

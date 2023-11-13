@@ -129,14 +129,17 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
                     options.uniformTypeIdentifier = self.requestedPhotoSettings.processedFileType.map { $0.rawValue }
 
                     var resourceType = PHAssetResourceType.photo
+                    // If we are using iOS17's deferred photo proxy then resource type is photoProxy rather than photo
                     if  ( resolvedSettings.deferredPhotoProxyDimensions.width > 0 ) && ( resolvedSettings.deferredPhotoProxyDimensions.height > 0 ) {
                         resourceType = PHAssetResourceType.photoProxy
                     }
+                    // Add the photo to the Photo Library
                     creationRequest.addResource(with: resourceType, data: self.photoData!, options: options)
 
                     // Specify the location in which the photo was taken.
                     creationRequest.location = self.location
 
+                    // If it was a live photo add the Live Video to the Photo that was just added
                     if let livePhotoCompanionMovieURL = self.livePhotoCompanionMovieURL {
                         let livePhotoCompanionMovieFileOptions = PHAssetResourceCreationOptions()
                         livePhotoCompanionMovieFileOptions.shouldMoveFile = true

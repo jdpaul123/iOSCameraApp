@@ -71,8 +71,11 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         case on, off
     }
     private var livePhotoMode: LivePhotoMode = .off
+    private var inProgressLivePhotoCapturesCount = 0
 
     private var photoQualityPrioritizationMode: AVCapturePhotoOutput.QualityPrioritization = .balanced
+
+    private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
 
     // MARK: View Controller Life Cycle
     override func viewDidLoad() {
@@ -80,7 +83,7 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
 
         // TODO: This button never gets enabled, so it must get enabled at some point
         // Disable buttons until everything is setup
-        cameraCaptureButton.isEnabled = false
+        cameraCaptureButton.isEnabled = true
 
         // Connect the instance of AVCaptureSession called self.session to the previewView's session property. The setter in Preview View then sets this\
         // instance of AVCaptureSession to the session for the AVCaptureVideoPreviewLayer instance called videoPreviewLayer. videoPreviewLayer's setter
@@ -330,31 +333,84 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
     // MARK: Capturing Photos
     @IBAction private func capturePhoto(_ photoButton: UIButton) {
         print("capturePhoto called")
-//        if self.photoSettings == nil {
-//            print("No photo settings to capture")
-//            return
-//        }
-//
-//        // Create a unique settings object for the request from our photoSettings
-//        let photoSettings = AVCapturePhotoSettings(from: self.photoSettings)
-//
-//        // Provide a unique temporary URL to write the Live Photo Movie to because Live Photo captures can overlap
-//        if photoSettings.livePhotoMovieFileURL != nil {
-//            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
-//        }
-//
-//        // Start tracking capture readiness on the main thread to synchronously update the shutter button's availability
-//        self.photoOutputReadinessCoordinator.startTrackingCaptureRequest(using: photoSettings)
-//
-//        let videoRotationAngle = self.videoDeviceRotationCoordinator.videoRotationAngleForHorizonLevelCapture
-//
-//        sessionQueue.async {
-//            if let photoOutputConnection = self.photoOutput.connection(with: .video) {
-//                photoOutputConnection.videoRotationAngle = videoRotationAngle
-//            }
-//
-//            let photoCaptureProcessor = PhotoCaptu
-//        }
+        if self.photoSettings == nil {
+            print("No photo settings to capture")
+            return
+        }
+
+        // Create a unique settings object for the request from our photoSettings
+        let photoSettings = AVCapturePhotoSettings(from: self.photoSettings)
+
+        // Provide a unique temporary URL to write the Live Photo Movie to because Live Photo captures can overlap
+        if photoSettings.livePhotoMovieFileURL != nil {
+            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
+        }
+
+        // Start tracking capture readiness on the main thread to synchronously update the shutter button's availability
+        self.photoOutputReadinessCoordinator.startTrackingCaptureRequest(using: photoSettings)
+
+        let videoRotationAngle = self.videoDeviceRotationCoordinator.videoRotationAngleForHorizonLevelCapture
+
+        sessionQueue.async {
+            if let photoOutputConnection = self.photoOutput.connection(with: .video) {
+                photoOutputConnection.videoRotationAngle = videoRotationAngle
+            }
+
+            let photoCaptureProcessor = PhotoCaptureProcessor(with: photoSettings) {
+                // Will capture photo animation: flash the screen to signal that AVCam took a photo
+                DispatchQueue.main.async {
+                    self.previewView.videoPreviewLayer.opacity = 0
+                    UIView.animate(withDuration: 0.25) {
+                        self.previewView.videoPreviewLayer.opacity = 1
+                    }
+                }
+            } livePhotoCaptureHandler: { capturing in
+                // multiple Live Photo videos could be capturing at once
+                self.sessionQueue.async {
+                    if capturing {
+                        self.inProgressLivePhotoCapturesCount += 1
+                    } else {
+                        self.inProgressLivePhotoCapturesCount -= 1
+                    }
+
+                    // TODO: Impliment the below by creating the capturingLivePhotoLabel to show the user when the Live Photo video is being taken
+                    // Copy the value of self.inProgresLivePhotoCapturesCount now in case the value changes before the async work below occurs
+//                    let inProgressLivePhotoCapturesCount = self.inProgressLivePhotoCapturesCount
+//                    DispatchQueue.main.async {
+//                        if inProgressLivePhotoCapturesCount > 0 {
+//                            self.capturingLivePhotoLabel.isHidden = false
+//                        } else if inProgressLivePhotoCapturesCount == 0 {
+//                            self.capturingLivePhotoLabel.isHidden = true
+//                        } else {
+//                            print("Error: In progress Live Photo capture count is less than 0.")
+//                        }
+//                    }
+                }
+            } completionHandler: { photoCaptureProcessor in
+                // When the capture is complete, remove a reference to the photo capture delegate so it can be deallocated
+                self.sessionQueue.async {
+                    self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = nil
+                }
+            }
+
+            // Specify the location the photo was taken
+            photoCaptureProcessor.location = self.locationManager.location
+
+            // The photoOutput holds a weak reference to the photo capture delegate (aka. PhotoCaptureProcessor) and stores
+            // it in an array to maintain a strong reference. The key is the unique id of the current photo settings and the
+            // value is our photo capture delegate
+            // If we did not create this dictionary and save the photoCaptureProcessor then once we exit this async work block
+            // the Reference Counter would go to zero because it is initialized in this current scope. Then the photoCaptureProcessor would be deallocated :(
+            // We would then not have a PhotoCaptureDelegate to handle and save the photo.
+            // Now we can allow the photoCaptureProcessor to finish it's job and then access it at the end of it's work and deinit it by setting it to nil in the dictionary
+            self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = photoCaptureProcessor
+            // Now take the photo connecting the photoSettings we have set up and the photoCaptureProcessor delegate instance that will handle the events during
+            // the life cycle of taking an image
+            self.photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureProcessor)
+
+            // Stop tracking the capture request because it's now destined for the photo output.
+            self.photoOutputReadinessCoordinator.stopTrackingCaptureRequest(using: photoSettings.uniqueID)
+        }
     }
 
     private func setUpPhotoSettings() -> AVCapturePhotoSettings {
