@@ -14,6 +14,7 @@
 		52B0FE2C2B013ECE00C8DE76 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52B0FE2B2B013ECE00C8DE76 /* Assets.xcassets */; };
 		52B0FE2F2B013ECE00C8DE76 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52B0FE2D2B013ECE00C8DE76 /* LaunchScreen.storyboard */; };
 		52B0FE372B0160B500C8DE76 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE362B0160B500C8DE76 /* PreviewView.swift */; };
+		52B0FE392B01B8C300C8DE76 /* PhotoCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE382B01B8C300C8DE76 /* PhotoCaptureProcessor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		52B0FE2E2B013ECE00C8DE76 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		52B0FE302B013ECE00C8DE76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52B0FE362B0160B500C8DE76 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		52B0FE382B01B8C300C8DE76 /* PhotoCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureProcessor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				52B0FE222B013ECD00C8DE76 /* AppDelegate.swift */,
 				52B0FE242B013ECD00C8DE76 /* SceneDelegate.swift */,
 				52B0FE262B013ECD00C8DE76 /* ViewController.swift */,
+				52B0FE382B01B8C300C8DE76 /* PhotoCaptureProcessor.swift */,
 				52B0FE362B0160B500C8DE76 /* PreviewView.swift */,
 				52B0FE282B013ECD00C8DE76 /* Main.storyboard */,
 				52B0FE2B2B013ECE00C8DE76 /* Assets.xcassets */,
@@ -142,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				52B0FE272B013ECD00C8DE76 /* ViewController.swift in Sources */,
+				52B0FE392B01B8C300C8DE76 /* PhotoCaptureProcessor.swift in Sources */,
 				52B0FE372B0160B500C8DE76 /* PreviewView.swift in Sources */,
 				52B0FE232B013ECD00C8DE76 /* AppDelegate.swift in Sources */,
 				52B0FE252B013ECD00C8DE76 /* SceneDelegate.swift in Sources */,

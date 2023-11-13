@@ -78,6 +78,7 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // TODO: This button never gets enabled, so it must get enabled at some point
         // Disable buttons until everything is setup
         cameraCaptureButton.isEnabled = false
 
@@ -327,6 +328,35 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
     }
 
     // MARK: Capturing Photos
+    @IBAction private func capturePhoto(_ photoButton: UIButton) {
+        print("capturePhoto called")
+//        if self.photoSettings == nil {
+//            print("No photo settings to capture")
+//            return
+//        }
+//
+//        // Create a unique settings object for the request from our photoSettings
+//        let photoSettings = AVCapturePhotoSettings(from: self.photoSettings)
+//
+//        // Provide a unique temporary URL to write the Live Photo Movie to because Live Photo captures can overlap
+//        if photoSettings.livePhotoMovieFileURL != nil {
+//            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
+//        }
+//
+//        // Start tracking capture readiness on the main thread to synchronously update the shutter button's availability
+//        self.photoOutputReadinessCoordinator.startTrackingCaptureRequest(using: photoSettings)
+//
+//        let videoRotationAngle = self.videoDeviceRotationCoordinator.videoRotationAngleForHorizonLevelCapture
+//
+//        sessionQueue.async {
+//            if let photoOutputConnection = self.photoOutput.connection(with: .video) {
+//                photoOutputConnection.videoRotationAngle = videoRotationAngle
+//            }
+//
+//            let photoCaptureProcessor = PhotoCaptu
+//        }
+    }
+
     private func setUpPhotoSettings() -> AVCapturePhotoSettings {
         var photoSettings = AVCapturePhotoSettings()
 
@@ -352,6 +382,13 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
 
         return photoSettings
+    }
+
+    private func livePhotoMovieUniqueTemporaryDirectoryFileURL() -> URL {
+        let livePhotoMovieFileName = UUID().uuidString
+        let livePhotoMovieFilePath = (NSTemporaryDirectory() as NSString).appendingPathComponent((livePhotoMovieFileName as NSString).appendingPathExtension("mov")!)
+        let livePhotoMovieURL = NSURL.fileURL(withPath: livePhotoMovieFilePath)
+        return livePhotoMovieURL
     }
 
     // MARK: Device Configuration
