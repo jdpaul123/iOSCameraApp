@@ -36,16 +36,28 @@
                                     <action selector="capturePhoto:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kVY-G8-PtQ"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zCf-5W-Whb" userLabel="Video Capture Button">
+                                <rect key="frame" x="86.666666666666671" y="748" width="60.000000000000014" height="60"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain">
+                                    <backgroundConfiguration key="background" image="CaptureVideo"/>
+                                </buttonConfiguration>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="zCf-5W-Whb" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="1YE-Cd-5XY"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="HeJ-YR-GDq" secondAttribute="bottom" constant="10" id="2O1-Mv-aPn"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="3cr-wn-xPP"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="5Zu-bT-nQj"/>
+                            <constraint firstItem="HeJ-YR-GDq" firstAttribute="top" secondItem="zCf-5W-Whb" secondAttribute="top" id="7FT-9N-qtA"/>
+                            <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" secondItem="zCf-5W-Whb" secondAttribute="trailing" constant="20" id="GaC-br-nLk"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="MQl-dc-Xh0"/>
+                            <constraint firstItem="HeJ-YR-GDq" firstAttribute="height" secondItem="zCf-5W-Whb" secondAttribute="height" id="USi-8g-AP9"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ZgU-2s-unV"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="HeJ-YR-GDq" secondAttribute="trailing" constant="10" id="fSW-KN-vDH"/>
+                            <constraint firstItem="HeJ-YR-GDq" firstAttribute="width" secondItem="zCf-5W-Whb" secondAttribute="width" id="gSr-M8-fam"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="oGD-fn-Tec"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="u5J-G0-ZfI"/>
                         </constraints>
@@ -62,6 +74,7 @@
     </scenes>
     <resources>
         <image name="CameraButtonImage" width="100" height="100"/>
+        <image name="CaptureVideo" width="150" height="150"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
