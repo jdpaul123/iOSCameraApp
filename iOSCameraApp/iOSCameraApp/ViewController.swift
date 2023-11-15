@@ -470,7 +470,14 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
             photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes.first!]
         }
+
+        // Turn on live photo mode if it is set to be on
+        if self.livePhotoMode == .on && self.photoOutput.isLivePhotoCaptureSupported { // Live capture mode is not supported in movie mode
+            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
+        }
+
         photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
+
 
         return photoSettings
     }
