@@ -329,9 +329,10 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         // Set these different options for the photo output if they are supported
         self.photoOutput.isLivePhotoCaptureEnabled = self.photoOutput.isLivePhotoCaptureSupported
         self.photoOutput.maxPhotoQualityPrioritization = .quality
-        self.photoOutput.isResponsiveCaptureEnabled = self.photoOutput.isResponsiveCaptureSupported // TODO: This is new for iOS 17
-        self.photoOutput.isFastCapturePrioritizationEnabled = self.photoOutput.isFastCapturePrioritizationSupported // TODO: This is new for iOS 17
-        self.photoOutput.isAutoDeferredPhotoDeliveryEnabled = self.photoOutput.isAutoDeferredPhotoDeliverySupported // TODO: This is new for iOS 17
+        self.photoOutput.isResponsiveCaptureEnabled = self.photoOutput.isResponsiveCaptureSupported // New for iOS 17: Allows paralellization of photo processing to allow photo capture to happen quicker. Hititng capture button multiple times in quick succession
+        self.photoOutput.isFastCapturePrioritizationEnabled = self.photoOutput.isFastCapturePrioritizationSupported // New for iOS 17: allows for quality to go from .quality to .balanced if user is taking a bunch of photos at once
+        self.photoOutput.isAutoDeferredPhotoDeliveryEnabled = self.photoOutput.isAutoDeferredPhotoDeliverySupported // New for iOS 15: Allows using Deep Fusion, but defering the photo processing until the user is done taking photos to keep a more responsive UI and higher quality photos.
+        // Deferred Photo Delivery uses a proxy photo in the short term and replaces it with the fully processed photo later
 
         let photoSettings = self.setUpPhotoSettings()
         DispatchQueue.main.async {
