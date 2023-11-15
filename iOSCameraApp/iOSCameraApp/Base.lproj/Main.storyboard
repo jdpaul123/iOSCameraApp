@@ -66,6 +66,17 @@
                                     <action selector="resumeInterruptedSession:" destination="BYZ-38-t0r" eventType="touchUpInside" id="spL-hI-aPt"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="wAQ-cY-xZU" userLabel="Capture Mode">
+                                <rect key="frame" x="152.66666666666666" y="680" width="88" height="45"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="QSQ-ix-qtf"/>
+                                    <constraint firstAttribute="width" secondItem="wAQ-cY-xZU" secondAttribute="height" multiplier="80:40" id="YUi-zs-OVW"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="" image="PhotoSelector"/>
+                                    <segment title="" image="MovieSelector"/>
+                                </segments>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -76,6 +87,8 @@
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="5Zu-bT-nQj"/>
                             <constraint firstItem="Mcq-gK-E9u" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5vU-n3-Rev"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="top" secondItem="zCf-5W-Whb" secondAttribute="top" id="7FT-9N-qtA"/>
+                            <constraint firstItem="wAQ-cY-xZU" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Cfz-Xj-bze"/>
+                            <constraint firstItem="HeJ-YR-GDq" firstAttribute="top" secondItem="wAQ-cY-xZU" secondAttribute="bottom" constant="24" id="FuF-d3-dQg"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" secondItem="zCf-5W-Whb" secondAttribute="trailing" constant="20" id="GaC-br-nLk"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="MQl-dc-Xh0"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="height" secondItem="zCf-5W-Whb" secondAttribute="height" id="USi-8g-AP9"/>
@@ -109,6 +122,8 @@
     <resources>
         <image name="CameraButtonImage" width="100" height="100"/>
         <image name="CaptureVideo" width="150" height="150"/>
+        <image name="MovieSelector" width="72" height="72"/>
+        <image name="PhotoSelector" width="72" height="72"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
