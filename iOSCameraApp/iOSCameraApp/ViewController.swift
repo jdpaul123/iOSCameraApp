@@ -185,6 +185,18 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         }
     }
 
+    // Only break down the AVCaptureSession instance if it setup. Then stop it from running
+    // Restart the sesison every time we reopen the app even if it was already open
+    override func viewWillDisappear(_ animated: Bool) {
+        sessionQueue.async {
+            if self.setUpResult == .success {
+                self.session.stopRunning()
+                self.isSessionRunning = self.session.isRunning
+                self.removeObservers()
+            }
+        }
+    }
+
     // MARK: Session Management
     // Only call this on the session queue
     private func configureSession() {
@@ -340,6 +352,40 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         }
     }
 
+    private func setUpPhotoSettings() -> AVCapturePhotoSettings {
+        var photoSettings = AVCapturePhotoSettings()
+
+        // Capture HEIF photos when supported
+        if self.photoOutput.availablePhotoCodecTypes.contains(AVVideoCodecType.hevc) {
+            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        } else {
+            // FIXME: This seems to be redundant
+            photoSettings = AVCapturePhotoSettings()
+        }
+
+        // Set the flash to auto mode
+        if self.videoDeviceInput.device.isFlashAvailable {
+            photoSettings.flashMode = .auto
+        }
+
+        photoSettings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
+
+        // TODO: What does this if statement do?
+        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
+            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes.first!]
+        }
+
+        // Turn on live photo mode if it is set to be on
+        if self.livePhotoMode == .on && self.photoOutput.isLivePhotoCaptureSupported { // Live capture mode is not supported in movie mode
+            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
+        }
+
+        photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
+
+
+        return photoSettings
+    }
+
     @IBAction private func resumeInterruptedSession(_ resumeButton: UIButton) {
         sessionQueue.async {
             // The session might fail to start running, for example, if a phone
@@ -447,40 +493,6 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
             // Stop tracking the capture request because it's now destined for the photo output.
             self.photoOutputReadinessCoordinator.stopTrackingCaptureRequest(using: photoSettings.uniqueID)
         }
-    }
-
-    private func setUpPhotoSettings() -> AVCapturePhotoSettings {
-        var photoSettings = AVCapturePhotoSettings()
-
-        // Capture HEIF photos when supported
-        if self.photoOutput.availablePhotoCodecTypes.contains(AVVideoCodecType.hevc) {
-            photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
-        } else {
-            // FIXME: This seems to be redundant
-            photoSettings = AVCapturePhotoSettings()
-        }
-
-        // Set the flash to auto mode
-        if self.videoDeviceInput.device.isFlashAvailable {
-            photoSettings.flashMode = .auto
-        }
-
-        photoSettings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
-
-        // TODO: What does this if statement do?
-        if !photoSettings.availablePreviewPhotoPixelFormatTypes.isEmpty {
-            photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: photoSettings.__availablePreviewPhotoPixelFormatTypes.first!]
-        }
-
-        // Turn on live photo mode if it is set to be on
-        if self.livePhotoMode == .on && self.photoOutput.isLivePhotoCaptureSupported { // Live capture mode is not supported in movie mode
-            photoSettings.livePhotoMovieFileURL = livePhotoMovieUniqueTemporaryDirectoryFileURL()
-        }
-
-        photoSettings.photoQualityPrioritization = self.photoQualityPrioritizationMode
-
-
-        return photoSettings
     }
 
     private func livePhotoMovieUniqueTemporaryDirectoryFileURL() -> URL {
