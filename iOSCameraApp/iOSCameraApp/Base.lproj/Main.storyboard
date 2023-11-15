@@ -20,6 +20,13 @@
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Camera Unavailable" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mTO-61-1lM">
+                                <rect key="frame" x="93" y="411.33333333333331" width="207" height="29.666666666666686"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <color key="textColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                                <color key="shadowColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HeJ-YR-GDq">
                                 <rect key="frame" x="166.66666666666666" y="748" width="60" height="60"/>
                                 <constraints>
@@ -43,6 +50,19 @@
                                     <backgroundConfiguration key="background" image="CaptureVideo"/>
                                 </buttonConfiguration>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mcq-gK-E9u">
+                                <rect key="frame" x="154" y="408.66666666666669" width="85.333333333333314" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Resume">
+                                    <backgroundConfiguration key="background">
+                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </backgroundConfiguration>
+                                    <color key="baseForegroundColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="resumeInterruptedSession:" destination="BYZ-38-t0r" eventType="touchUpInside" id="spL-hI-aPt"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -51,6 +71,7 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="HeJ-YR-GDq" secondAttribute="bottom" constant="10" id="2O1-Mv-aPn"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="3cr-wn-xPP"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="5Zu-bT-nQj"/>
+                            <constraint firstItem="Mcq-gK-E9u" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5vU-n3-Rev"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="top" secondItem="zCf-5W-Whb" secondAttribute="top" id="7FT-9N-qtA"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" secondItem="zCf-5W-Whb" secondAttribute="trailing" constant="20" id="GaC-br-nLk"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="MQl-dc-Xh0"/>
@@ -58,13 +79,18 @@
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ZgU-2s-unV"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="HeJ-YR-GDq" secondAttribute="trailing" constant="10" id="fSW-KN-vDH"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="width" secondItem="zCf-5W-Whb" secondAttribute="width" id="gSr-M8-fam"/>
+                            <constraint firstItem="mTO-61-1lM" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="ktm-BB-fqX"/>
                             <constraint firstItem="HeJ-YR-GDq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="oGD-fn-Tec"/>
+                            <constraint firstItem="Mcq-gK-E9u" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="s0s-Ly-u84"/>
+                            <constraint firstItem="mTO-61-1lM" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="u2s-sd-kCb"/>
                             <constraint firstItem="YeM-Bi-Dpk" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="u5J-G0-ZfI"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="cameraCaptureButton" destination="HeJ-YR-GDq" id="WMl-Os-jxb"/>
+                        <outlet property="cameraUnavailableLabel" destination="mTO-61-1lM" id="wTQ-3B-0zc"/>
                         <outlet property="previewView" destination="YeM-Bi-Dpk" id="By7-Qu-a6w"/>
+                        <outlet property="resumeButton" destination="Mcq-gK-E9u" id="GxZ-OH-L7p"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
