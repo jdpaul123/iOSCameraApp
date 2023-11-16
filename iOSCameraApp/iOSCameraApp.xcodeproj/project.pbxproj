@@ -15,7 +15,7 @@
 		52B0FE2F2B013ECE00C8DE76 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52B0FE2D2B013ECE00C8DE76 /* LaunchScreen.storyboard */; };
 		52B0FE372B0160B500C8DE76 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE362B0160B500C8DE76 /* PreviewView.swift */; };
 		52B0FE392B01B8C300C8DE76 /* PhotoCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE382B01B8C300C8DE76 /* PhotoCaptureProcessor.swift */; };
-		52B0FE612B05B29A00C8DE76 /* iOSCameraAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE602B05B29A00C8DE76 /* iOSCameraAppTests.swift */; };
+		52B0FE682B05B30600C8DE76 /* TestSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B0FE672B05B30600C8DE76 /* TestSessionConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,7 +40,7 @@
 		52B0FE362B0160B500C8DE76 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		52B0FE382B01B8C300C8DE76 /* PhotoCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureProcessor.swift; sourceTree = "<group>"; };
 		52B0FE5E2B05B29A00C8DE76 /* iOSCameraAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOSCameraAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		52B0FE602B05B29A00C8DE76 /* iOSCameraAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSCameraAppTests.swift; sourceTree = "<group>"; };
+		52B0FE672B05B30600C8DE76 /* TestSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSessionConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,7 +98,7 @@
 		52B0FE5F2B05B29A00C8DE76 /* iOSCameraAppTests */ = {
 			isa = PBXGroup;
 			children = (
-				52B0FE602B05B29A00C8DE76 /* iOSCameraAppTests.swift */,
+				52B0FE672B05B30600C8DE76 /* TestSessionConfiguration.swift */,
 			);
 			path = iOSCameraAppTests;
 			sourceTree = "<group>";
@@ -216,7 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52B0FE612B05B29A00C8DE76 /* iOSCameraAppTests.swift in Sources */,
+				52B0FE682B05B30600C8DE76 /* TestSessionConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

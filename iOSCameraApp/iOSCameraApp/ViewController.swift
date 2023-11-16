@@ -33,7 +33,7 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         case configurationFailed
     }
     private var setUpResult: SessionSetupResult = .success // We assume success unless there is some kind of failure or permission denial that occurs in ViewDidLoad or ViewWillAppear
-    private let session = AVCaptureSession() // This session accepts input data from capture devices and sends the data revieved to the correct outputs
+    let session = AVCaptureSession() // This session accepts input data from capture devices and sends the data revieved to the correct outputs
     private var isSessionRunning = false
     private let sessionQueue = DispatchQueue(label: "session queue")
     /*
