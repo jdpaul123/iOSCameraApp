@@ -82,6 +82,9 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
 
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
 
+    // MARK: Recording Videos Properties
+    private var movieFileOutput: AVCaptureMovieFileOutput?
+
     // TODO: Uncomment this when I impliment video
 //    private let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInTrueDepthCamera],
 //                                                                               mediaType: .video, position: .unspecified)
@@ -536,7 +539,119 @@ class ViewController: UIViewController, AVCapturePhotoOutputReadinessCoordinator
         }
     }
 
-    // MARK: Device Configuration
+    // MARK: Change camera
+//    private func changeCamera(_ videoDevice: AVCaptureDevice?, isUserSelection: Bool, completion: (() -> Void)? = nil) {
+//        sessionQueue.async {
+//            let currentVideoDevice = self.videoDeviceInput.device
+//            let newVideoDevice: AVCaptureDevice?
+//
+//            // if we pass in a video device to switch to make that the new one
+//            if let videoDevice = videoDevice {
+//                newVideoDevice = videoDevice
+//            } else {
+//                let currentPosition = currentVideoDevice.position // .front .back. or .unspecified
+//
+//                let backVideoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera],
+//                                                                                       mediaType: .video, position: .back)
+//
+//                let frontVideoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInWideAngleCamera],
+//                                                                                        mediaType: .video, position: .front)
+//
+//                let externalVideoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.external],
+//                                                                                           mediaType: .video, position: .unspecified)
+//
+//                switch currentPosition {
+//                case .unspecified, .front:
+//                    newVideoDevice = backVideoDeviceDiscoverySession.devices.first
+//
+//                case .back:
+//                    // Prioritize an external camera, like a plug in web-cam, over the built in back camera
+//                    if let externalCamera = externalVideoDeviceDiscoverySession.devices.first {
+//                        newVideoDevice = externalCamera
+//                    } else {
+//                        newVideoDevice = frontVideoDeviceDiscoverySession.devices.first
+//                    }
+//                @unknown default:
+//                    print("Unknown capture position. Defaulting to back, dual-camera")
+//                    newVideoDevice = AVCaptureDevice.default(.builtInDualCamera, for: .video, position: .back)
+//                }
+//            }
+//
+//            if let videoDevice = newVideoDevice {
+//                do {
+//                    let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
+//
+//                    self.session.beginConfiguration()
+//
+//                    // Remove the existing device input first, because AVCaptureSession doesn't support simultaneous use of the read and front cameras.
+//                    self.session.removeInput(self.videoDeviceInput)
+//
+//                    if self.session.canAddInput(videoDeviceInput) {
+//                        NotificationCenter.default.removeObserver(self, name: .AVCaptureDeviceSubjectAreaDidChange, object: currentVideoDevice)
+//                        NotificationCenter.default.addObserver(self, selector: #selector(self.subjectAreaDidChange), name: .AVCaptureDeviceSubjectAreaDidChange, object: videoDeviceInput.device)
+//
+//                        self.session.addInput(videoDeviceInput)
+//                        self.videoDeviceInput = videoDeviceInput
+//
+//                        if isUserSelection {
+//                            AVCaptureDevice.userPreferredCamera = videoDevice
+//                        }
+//
+//                        // The DEvice Rotation Coordinator takes in the input device to keep track of so we must create a new coordinator for the new video AVCaptureDeviceInput
+//                        DispatchQueue.main.async {
+//                            self.createDeviceRotationCoordinator()
+//                        }
+//                    } else {
+//                        // just reset the session back to the way it was if we cannot add the new input device
+//                        self.session.addInput(self.videoDeviceInput)
+//                    }
+//
+//                    // Now we deal with if we are switching to recording movies
+//                    if let connection = self.movieFileOutput?.connection(with: .video) {
+//                        self.session.sessionPreset = .high
+//
+//                        self.selectedMovieMode10BitDeviceFormat = self.tenBitVariantOfFormat(activeFormat: self.videoDeviceInput.device.activeFormat)
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    // MARK: Video Recording Functions
+    // TODO: Understand this function
+    func tenBitVariationOfFormat(activeFormat: AVCaptureDevice.Format) -> AVCaptureDevice.Format? {
+        let formats = self.videoDeviceInput.device.formats
+        let formatIndex = formats.firstIndex(of: activeFormat)!
+
+        let activeDimensions = CMVideoFormatDescriptionGetDimensions(activeFormat.formatDescription)
+        let activeMaxFrameRate = activeFormat.videoSupportedFrameRateRanges.last?.maxFrameRate
+        let activePixelFormat = CMFormatDescriptionGetMediaSubType(activeFormat.formatDescription)
+
+        // AVCaptureDeviceFormats are sorted from smallest to largest in resolution and frame rate. For each resolution and max frame rate there's a cluster of formats that only differ in pixelFormatType.
+        // Here, we look for an 'x420' variant of the current activeFormat.
+        if activePixelFormat != kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange {
+            // Current active format is not a 10-bit HDR format, find its 10-bit HDR variant.
+            for index in formatIndex + 1..<formats.count {
+                let format = formats[index]
+                let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                let maxFrameRate = format.videoSupportedFrameRateRanges.last?.maxFrameRate
+                let pixelFormat = CMFormatDescriptionGetMediaSubType(format.formatDescription)
+
+                // Don't advance beyond the current format cluster
+                if activeMaxFrameRate != maxFrameRate || activeDimensions.width != dimensions.width || activeDimensions.height != dimensions.height {
+                    break
+                }
+
+                if pixelFormat == kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange {
+                    return format
+                }
+            }
+        } else {
+            return activeFormat
+        }
+
+        return nil
+    }
 
 
 
